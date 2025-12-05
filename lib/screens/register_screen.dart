@@ -23,7 +23,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: pwController.text.trim(),
       );
 
-      // Go to login automatically
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -61,7 +60,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             const SizedBox(height: 40),
 
-            // Email
             TextField(
               controller: emailController,
               decoration: const InputDecoration(hintText: "Email"),
@@ -69,7 +67,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             const SizedBox(height: 16),
 
-            // Password
             TextField(
               controller: pwController,
               obscureText: true,

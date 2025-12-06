@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 import 'firebase_options.dart';
 import 'screens/auth_gate.dart';
 import 'screens/login_screen.dart';
@@ -23,15 +24,16 @@ class VibzcheckApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: Colors.deepPurple,
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: const Color(0xFF6C5CE7),
       brightness: Brightness.dark,
     );
 
     return MaterialApp(
+      title: 'Vibzcheck',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: scheme,
+        colorScheme: colorScheme,
         scaffoldBackgroundColor: const Color(0xFF050816),
         useMaterial3: true,
         appBarTheme: const AppBarTheme(
@@ -48,7 +50,18 @@ class VibzcheckApp extends StatelessWidget {
         '/home': (_) => const HomeScreen(),
         '/createSession': (_) => const CreateSessionScreen(),
         '/settings': (_) => const SettingsScreen(),
-        SessionScreen.routeName: (_) => const SessionScreen(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == SessionScreen.routeName) {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (_) => SessionScreen(
+              sessionId: args['sessionId'] as String,
+              sessionName: args['sessionName'] as String?,
+            ),
+          );
+        }
+        return null;
       },
     );
   }

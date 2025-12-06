@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import 'home_screen.dart';
 import 'login_screen.dart';
 
@@ -8,7 +9,7 @@ class AuthGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
+    return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -17,11 +18,11 @@ class AuthGate extends StatelessWidget {
           );
         }
 
-        if (snapshot.hasData) {
+        if (snapshot.data != null) {
           return const HomeScreen();
-        } else {
-          return const LoginScreen();
         }
+
+        return const LoginScreen();
       },
     );
   }

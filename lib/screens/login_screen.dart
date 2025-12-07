@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,14 +20,28 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => loading = true);
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential userCred =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: pwController.text.trim(),
       );
-    } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? "Login error")),
+
+      final uid = userCred.user!.uid;
+      final userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => HomeScreen(
+            username: userDoc["username"],
+            displayName: userDoc["displayName"],
+          ),
+        ),
       );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.message ?? "Login error")));
     }
 
     setState(() => loading = false);
@@ -40,56 +56,41 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              "Log in to VibezCheck",
+              "Welcome back",
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
-
             const SizedBox(height: 40),
-
-            // Email
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(
-                hintText: "Email",
-              ),
+              decoration: const InputDecoration(hintText: "Email"),
             ),
-
             const SizedBox(height: 16),
-
-            // Password
             TextField(
               controller: pwController,
               obscureText: true,
-              decoration: const InputDecoration(
-                hintText: "Password",
-              ),
+              decoration: const InputDecoration(hintText: "Password"),
             ),
-
             const SizedBox(height: 24),
-
             loading
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
+                    onPressed: login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1DB954),
                       minimumSize: const Size(double.infinity, 52),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
+                          borderRadius: BorderRadius.circular(30)),
                     ),
-                    onPressed: login,
                     child: const Text(
-                      "Log In",
+                      "Login",
                       style: TextStyle(fontSize: 18, color: Colors.black),
                     ),
                   ),
-
             const SizedBox(height: 24),
-
             TextButton(
               onPressed: () {
                 Navigator.push(
